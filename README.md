@@ -86,6 +86,16 @@ The API will be available at `http://localhost:3000`.
 
 ---
 
+## Live Demo
+
+API deployed at: 
+
+https://notifications-api-production-7bbf.up.railway.app/
+
+Swagger UI: 
+
+https://notifications-api-production-7bbf.up.railway.app/api
+
 ## API Documentation
 
 Swagger UI is available at: http://localhost:3000/api
