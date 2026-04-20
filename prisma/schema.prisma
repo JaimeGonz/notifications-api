@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  password      String
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  channel   String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}

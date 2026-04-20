@@ -1,0 +1,42 @@
+### Registrar usuario
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+    "email": "valdoc7@example.com",
+    "password": "12345678"
+}
+
+### Login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "valdoc7@example.com",
+    "password": "12345678"
+}
+
+### Registro con email inválido
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+    "email": "emailinvalido",
+    "password": "12345678"
+}
+
+### Registro con password corta
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "123"
+}
+
+20 - 125
+1 - 6.25
+
+
+
+### eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImVtYWlsIjoidmFsZG9jN0BleGFtcGxlLmNvbSIsImlhdCI6MTc3NjQ3MTkxMywiZXhwIjoxNzc3MDc2NzEzfQ.FYaVWhbwQ13OHzimlzfzGOuvKXBCOeHxH-QKv2GS0KM
