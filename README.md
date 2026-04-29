@@ -6,6 +6,31 @@ Built with **NestJS**, **PostgreSQL**, and **Prisma ORM**. Implements the **Stra
 
 ---
 
+## Table of contents
+
+- [Notifications API](#notifications-api)
+  - [Table of contents](#table-of-contents)
+  - [Tech Stack](#tech-stack)
+  - [Architecture](#architecture)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+  - [API Documentation](#api-documentation)
+  - [Live Demo](#live-demo)
+  - [API Endpoints](#api-endpoints)
+    - [Auth](#auth)
+    - [Notifications](#notifications)
+    - [Notification channels](#notification-channels)
+  - [Technical Decisions](#technical-decisions)
+    - [Strategy Pattern for notification channels](#strategy-pattern-for-notification-channels)
+    - [Repository Pattern](#repository-pattern)
+    - [JWT Authentication](#jwt-authentication)
+    - [Prisma ORM](#prisma-orm)
+  - [Known Limitations](#known-limitations)
+  - [Author](#author)
+
+---
+
 ## Tech Stack
 
 - **NestJS** — Node.js framework
@@ -19,6 +44,12 @@ Built with **NestJS**, **PostgreSQL**, and **Prisma ORM**. Implements the **Stra
 
 ## Architecture
 
+The project follows **Clean Architecture** principles, separating responsibilities into distinct layers:
+
+**Controller**  →  handles HTTP requests and responses
+**Service**     →  business logic
+**Repository**  →  data access layer (abstracts Prisma)
+
 The notification delivery system uses the **Strategy pattern** to handle different channels:
 
 - Each channel (`email`, `sms`, `push`) is an independent class implementing a common `NotificationChannel` interface.
@@ -26,13 +57,13 @@ The notification delivery system uses the **Strategy pattern** to handle differe
 - Adding a new channel only requires creating a new class and registering it in the factory — no existing code is modified (**Open/Closed Principle**).
 ```
 src/
-├── auth/                  # JWT authentication
+├── auth/                                    # JWT authentication
 │   ├── dto/
 │   ├── jwt-auth.guard.ts
 │   ├── jwt.strategy.ts
 │   └── get-user.decorator.ts
-├── notifications/         # Notifications module
-│   ├── channels/          # Strategy pattern implementation
+├── notifications/                           # Notifications module
+│   ├── channels/                            # Strategy pattern implementation
 │   │   ├── channel.interface.ts
 │   │   ├── email.channel.ts
 │   │   ├── sms.channel.ts
@@ -40,9 +71,12 @@ src/
 │   ├── dto/
 │   ├── notification-channel.factory.ts
 │   ├── notifications.controller.ts
+│   ├── notifications.repository.ts
 │   └── notifications.service.ts
-├── users/                 # Users module
-└── prisma/                # Database connection
+├── users/                                  # Users module
+│   ├── users.repository.ts
+│   └── users.service.ts
+└── prisma/                                 # Database connection
 ```
 ---
 
@@ -85,6 +119,9 @@ npm run start:dev
 The API will be available at `http://localhost:3000`.
 
 ---
+## API Documentation
+
+Swagger UI is available at: http://localhost:3000/api
 
 ## Live Demo
 
@@ -95,10 +132,6 @@ https://notifications-api-production-7bbf.up.railway.app/
 Swagger UI: 
 
 https://notifications-api-production-7bbf.up.railway.app/api
-
-## API Documentation
-
-Swagger UI is available at: http://localhost:3000/api
 
 ---
 
@@ -135,10 +168,30 @@ All endpoints require `Authorization: Bearer <token>` header.
 ## Technical Decisions
 
 ### Strategy Pattern for notification channels
-The challenge required that adding a new channel should not require modifying existing logic. The Strategy pattern solves this by encapsulating each channel's logic in its own class behind a common interface. The factory acts as the single point of channel selection.
+The challenge required that adding a new channel should not require modifying existing logic. The Strategy pattern solves this by encapsulating each channel's logic in its own class behind a common interface. The factory acts as the single point of channel selection. This follows the **Open/Closed Principle** — open for extension, closed for modification.
+
+### Repository Pattern
+A repository layer was added to abstract data access from business logic. The service layer has no knowledge of Prisma or any ORM — it only interacts with the repository. This makes the codebase easier to test and allows swapping the ORM without touching business logic.
 
 ### JWT Authentication
 Each user can only access their own notifications. The authenticated user's ID is extracted from the JWT payload and used to scope all database queries.
 
 ### Prisma ORM
-Prisma was chosen for its type-safe queries and straightforward migration workflow, which reduces runtime errors and improves developer experience.
+Prisma was chosen for its type-safe queries and straightforward migration workflow, which reduces runtime errors and improves developer experience.****
+
+---
+
+## Known Limitations
+
+- Notification sending is simulated with console logs. In a production system, real email/SMS/push providers would be integrated (e.g. SendGrid, Twilio, Firebase).
+- If the channel send fails after the notification is saved to the database, the notification remains persisted. A retry mechanism or transactional approach would be needed in production.
+
+---
+
+## Author
+
+Jaime González
+
+- GitHub: https://github.com/JaimeGonz
+- LinkedIn: https://linkedin.com/in/jaimegonz01
+- Email: valdoc7@gmail.com
