@@ -1,25 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
 import { NotificationChannelFactory } from './notification-channel.factory';
 import { CreateNotificationDto } from './dto/create-notification.dto';
+import { NotificationsRepository } from './notifications.repository';
 
 @Injectable()
 export class NotificationsService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly repository: NotificationsRepository,
     private readonly channelFactory: NotificationChannelFactory,
   ) {}
 
   async create(dto: CreateNotificationDto, userId: number) {
     // Guardar notification en base de datos
-    const notification = await this.prisma.notification.create({
-      data: {
-        title: dto.title,
-        content: dto.content,
-        channel: dto.channel,
-        userId,
-      },
-    });
+    const notification = await this.repository.create(dto, userId);
 
     // Obtener canal correcto via Factory
     const channel = this.channelFactory.getChannel(dto.channel);
@@ -35,21 +28,11 @@ export class NotificationsService {
   }
 
   async findAll(userId: number) {
-    return await this.prisma.notification.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-    });
+    return await this.repository.findAllByUser(userId);
   }
 
   async findOne(id: number, userId: number) {
-    const notification = await this.prisma.notification.findFirst({
-      where: { id, userId },
-    });
-    if (!notification) {
-      throw new NotFoundException(`Notificación ${id} no encontrada`);
-    }
-
-    return notification;
+    return await this.repository.findOneByUser(id, userId);
   }
 
   async update(
@@ -57,19 +40,12 @@ export class NotificationsService {
     userId: number,
     dto: Partial<CreateNotificationDto>,
   ) {
-    await this.findOne(id, userId);
-
-    return await this.prisma.notification.update({
-      where: { id },
-      data: dto,
-    });
+    await this.repository.findOneByUser(id, userId);
+    return await this.repository.update(id, dto);
   }
 
   async remove(id: number, userId: number) {
-    await this.findOne(id, userId);
-
-    return await this.prisma.notification.delete({
-      where: { id },
-    });
+    await this.repository.findOneByUser(id, userId);
+    return await this.repository.remove(id);
   }
 }
