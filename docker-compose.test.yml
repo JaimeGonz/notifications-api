@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  api-test:
+    build: .
+    env_file:
+      - .env.docker.test
+    depends_on:
+      - db-test
+    command: npm run test
+
+  db-test:
+    image: postgres:15-alpine
+    env_file:
+      - .env.docker.test

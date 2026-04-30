@@ -15,6 +15,11 @@ Built with **NestJS**, **PostgreSQL**, and **Prisma ORM**. Implements the **Stra
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Installation](#installation)
+  - [Run with Docker](#run-with-docker)
+    - [Prerequisites](#prerequisites-1)
+    - [Setup](#setup)
+    - [Run the app](#run-the-app)
+    - [Run the tests](#run-the-tests)
   - [API Documentation](#api-documentation)
   - [Live Demo](#live-demo)
   - [API Endpoints](#api-endpoints)
@@ -118,6 +123,35 @@ npm run start:dev
 
 The API will be available at `http://localhost:3000`.
 
+---
+## Run with Docker
+
+### Prerequisites
+- Docker and Docker Compose installed
+
+### Setup
+
+1. Copy the environment files:
+```bash
+cp .env.docker.example .env.docker
+cp .env.docker.test.example .env.docker.test
+```
+
+2. Update the values in `.env.docker` and `.env.docker.test` with your credentials.
+
+### Run the app
+```bash
+chmod 777 ./up_dev.sh
+./up_dev.sh
+```
+
+The API will be available at `http://localhost:3000`.
+
+### Run the tests
+```bash
+chmod 777 ./up_test.sh
+./up_test.sh
+```
 ---
 ## API Documentation
 
