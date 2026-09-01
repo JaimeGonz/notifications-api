@@ -31,6 +31,7 @@ Built with **NestJS**, **PostgreSQL**, and **Prisma ORM**. Implements the **Stra
     - [Repository Pattern](#repository-pattern)
     - [JWT Authentication](#jwt-authentication)
     - [Prisma ORM](#prisma-orm)
+  - [Testing](#testing)
   - [Known Limitations](#known-limitations)
   - [Author](#author)
 
@@ -44,6 +45,7 @@ Built with **NestJS**, **PostgreSQL**, and **Prisma ORM**. Implements the **Stra
 - **JWT** — Authentication
 - **Bcrypt** — Password hashing
 - **Swagger** — API documentation
+- **Jest** — Unit testing
 
 ---
 
@@ -152,18 +154,22 @@ The API will be available at `http://localhost:3000`.
 chmod 777 ./up_test.sh
 ./up_test.sh
 ```
+
+Runs the unit test suite in an isolated Dockerized environment, with its own PostgreSQL test database (`docker-compose.test.yml`).
+
 ---
+
 ## API Documentation
 
 Swagger UI is available at: http://localhost:3000/api
 
 ## Live Demo
 
-API deployed at: 
+API deployed at:
 
 https://notifications-api-production-7bbf.up.railway.app/
 
-Swagger UI: 
+Swagger UI:
 
 https://notifications-api-production-7bbf.up.railway.app/api
 
@@ -211,7 +217,18 @@ A repository layer was added to abstract data access from business logic. The se
 Each user can only access their own notifications. The authenticated user's ID is extracted from the JWT payload and used to scope all database queries.
 
 ### Prisma ORM
-Prisma was chosen for its type-safe queries and straightforward migration workflow, which reduces runtime errors and improves developer experience.****
+Prisma was chosen for its type-safe queries and straightforward migration workflow, which reduces runtime errors and improves developer experience.
+
+---
+
+## Testing
+
+Unit tests are written with **Jest**, using mocked dependencies so the business logic is tested in full isolation (no real database or network calls).
+
+- **`notifications.service.spec.ts`** — covers all 5 service methods (`create`, `findAll`, `findOne`, `update`, `remove`), including the error case where a notification is not found (`NotFoundException`).
+- **`notification-channel.factory.spec.ts`** — covers all 3 valid channel strategies (`email`, `sms`, `push`) plus the invalid-channel case (`BadRequestException`), validating the Strategy pattern resolves correctly.
+
+Tests run in an isolated Dockerized environment against a dedicated test database — see [Run the tests](#run-the-tests).
 
 ---
 
@@ -219,6 +236,7 @@ Prisma was chosen for its type-safe queries and straightforward migration workfl
 
 - Notification sending is simulated with console logs. In a production system, real email/SMS/push providers would be integrated (e.g. SendGrid, Twilio, Firebase).
 - If the channel send fails after the notification is saved to the database, the notification remains persisted. A retry mechanism or transactional approach would be needed in production.
+- Unit tests cover the service and channel-selection logic; controller-level and full e2e coverage are still limited to the default health-check test.
 
 ---
 
